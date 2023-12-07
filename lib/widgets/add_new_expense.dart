@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:manage_my_expenses_app/models/expense.dart';
 
@@ -14,6 +12,30 @@ class _AddNewExpenseState extends State<AddNewExpense> {
   final _textController = TextEditingController();
   final _amountController = TextEditingController();
   Category _selectedCategory = Category.food;
+
+  // date variables
+  final DateTime initialDate = DateTime.now();
+  final DateTime firstDate = DateTime(
+      DateTime.now().year - 1, DateTime.now().month, DateTime.now().day);
+  final DateTime lastDate = DateTime(
+      DateTime.now().year + 2, DateTime.now().month, DateTime.now().day);
+  DateTime _selectedDate = DateTime.now();
+  // date picker
+  Future<void> _openDateModel() async {
+    try {
+      final pickedDate = await showDatePicker(
+          context: context,
+          initialDate: initialDate,
+          firstDate: firstDate,
+          lastDate: lastDate);
+
+      setState(() {
+        _selectedDate = pickedDate!;
+      });
+    } catch (error) {
+      print(error.toString());
+    }
+  }
 
   @override
   void dispose() {
@@ -56,9 +78,9 @@ class _AddNewExpenseState extends State<AddNewExpense> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const Text("2023.12.25"),
+                    Text(formatDate.format(_selectedDate)),
                     IconButton(
-                        onPressed: () {},
+                        onPressed: _openDateModel,
                         icon: const Icon(Icons.date_range_sharp))
                   ],
                 ),
