@@ -37,6 +37,29 @@ class _ExpencesState extends State<Expences> {
     });
   }
 
+  // remove a expense
+  void onDeleteExpense(ExpenseModel expense) {
+    // store the deletinf expense
+    ExpenseModel deletingExpense = expense;
+
+    // get the index of the removing expense
+    final int removingIndex = _expenseList.indexOf(expense);
+
+    setState(() {
+      _expenseList.remove(expense);
+    });
+    // show snackbar
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text("Expense deleted successful"),
+        action: SnackBarAction(
+            label: "undo",
+            onPressed: () {
+              setState(() {
+                _expenseList.insert(removingIndex, deletingExpense);
+              });
+            })));
+  }
+
   // function to open a model overlay
   void _openAddExpensesOverlay() {
     showModalBottomSheet(
@@ -75,7 +98,10 @@ class _ExpencesState extends State<Expences> {
         ),
         body: Column(
           children: [
-            ExpenseList(expenseList: _expenseList),
+            ExpenseList(
+              expenseList: _expenseList,
+              onDeleteExpense: onDeleteExpense,
+            ),
           ],
         ));
   }
