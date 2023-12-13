@@ -30,6 +30,13 @@ class _ExpencesState extends State<Expences> {
         category: Category.cloths),
   ];
 
+  // add new expense
+  void onAddNewExpense(ExpenseModel expense) {
+    setState(() {
+      _expenseList.add(expense);
+    });
+  }
+
   // function to open a model overlay
   void _openAddExpensesOverlay() {
     showModalBottomSheet(
@@ -39,7 +46,9 @@ class _ExpencesState extends State<Expences> {
       backgroundColor: const Color.fromARGB(255, 255, 253, 231),
       context: context,
       builder: (context) {
-        return const AddNewExpense();
+        return AddNewExpense(
+          onAddExpense: onAddNewExpense,
+        );
       },
     );
   }

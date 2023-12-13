@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:manage_my_expenses_app/models/expense.dart';
 
 class AddNewExpense extends StatefulWidget {
-  const AddNewExpense({super.key});
+  final void Function(ExpenseModel expense) onAddExpense;
+  const AddNewExpense({super.key, required this.onAddExpense});
 
   @override
   State<AddNewExpense> createState() => _AddNewExpenseState();
 }
 
 class _AddNewExpenseState extends State<AddNewExpense> {
-  final _textController = TextEditingController();
+  final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   Category _selectedCategory = Category.food;
 
@@ -37,11 +38,48 @@ class _AddNewExpenseState extends State<AddNewExpense> {
     }
   }
 
+  // form validation
+  void _handleFormSubmit() {
+    // form validation
+    // convert the amount into a double
+    final userAmount = double.parse(_amountController.text.trim());
+    if (_titleController.text.trim().isEmpty || userAmount <= 0) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Invalid Input"),
+            content: const Text(
+                "Please enter the valid data for the title and the amount here the title can not be empty and amount can not be '0' or 'less than zero'."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("close"),
+              )
+            ],
+          );
+        },
+      );
+    } else {
+      // create new expense
+      ExpenseModel newExpense = ExpenseModel(
+          productName: _titleController.text.trim(),
+          amount: userAmount,
+          date: _selectedDate,
+          category: _selectedCategory);
+      // save the data
+      widget.onAddExpense(newExpense);
+      Navigator.pop(context);
+    }
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    _textController.dispose();
+    _titleController.dispose();
     _amountController.dispose();
   }
 
@@ -52,7 +90,7 @@ class _AddNewExpenseState extends State<AddNewExpense> {
       child: Column(
         children: [
           TextField(
-            controller: _textController,
+            controller: _titleController,
             decoration: const InputDecoration(
               hintText: "add new expense title",
               label: Text("Title"),
@@ -80,8 +118,10 @@ class _AddNewExpenseState extends State<AddNewExpense> {
                   children: [
                     Text(formatDate.format(_selectedDate)),
                     IconButton(
-                        onPressed: _openDateModel,
-                        icon: const Icon(Icons.date_range_sharp))
+                      color: Colors.amber,
+                      onPressed: _openDateModel,
+                      icon: const Icon(Icons.date_range_sharp),
+                    )
                   ],
                 ),
               ),
@@ -115,7 +155,9 @@ class _AddNewExpenseState extends State<AddNewExpense> {
               children: [
                 // close the model button
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   style: const ButtonStyle(
                     shape: MaterialStatePropertyAll(
                       RoundedRectangleBorder(
@@ -136,7 +178,7 @@ class _AddNewExpenseState extends State<AddNewExpense> {
                 const SizedBox(width: 0),
                 // save the date and close the model button
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _handleFormSubmit,
                   style: const ButtonStyle(
                     shape: MaterialStatePropertyAll(
                       RoundedRectangleBorder(
