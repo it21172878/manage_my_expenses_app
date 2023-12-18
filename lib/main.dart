@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:manage_my_expenses_app/models/expense.dart';
 import 'package:manage_my_expenses_app/pages/expenses.dart';
+import 'package:manage_my_expenses_app/server/categories_adapter.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(ExpenseModelAdapter());
+  Hive.registerAdapter(CategoriesAdapter());
   runApp(const MainApp());
+
+  await Hive.openBox("expenseDatabase");
 }
 
 class MainApp extends StatelessWidget {
